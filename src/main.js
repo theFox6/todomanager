@@ -1,8 +1,22 @@
-import Vue from 'vue'
 import App from './App.vue'
+import { createApp } from "vue";
+import store from './store/store.js'
 
-Vue.config.productionTip = false
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+    faPen, faXmark,
+    faFire, faPersonRunning, faPersonWalking, faHourglass,
+    faBagShopping, faPersonDigging, faMountain, faAppleWhole
+} from '@fortawesome/free-solid-svg-icons'
+library.add(
+    faPen, faXmark,
+    faFire, faPersonRunning, faPersonWalking, faHourglass,
+    faBagShopping, faPersonDigging, faMountain, faAppleWhole
+)
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+store.commit('initialize')
+const app = createApp(App)
+app.component("FontAwesomeIcon", FontAwesomeIcon)
+app.use(store)
+app.mount('#todoapp')

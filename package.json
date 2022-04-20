@@ -1,6 +1,8 @@
 {
   "name": "todomanager",
-  "version": "0.1.0",
+  "author": "theFox6",
+  "description": "A ToDo List Application that calculates Task Priority using various parameters.",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -13,8 +15,11 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11",
+    "vue": "^3.2.31",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
