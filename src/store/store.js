@@ -28,7 +28,12 @@ export default createStore({
             return undefined
         },
         todosByPriority(state) {
-            return state.todos.sort((a,b) => calculatePriority(b) - calculatePriority(a))
+            return state.todos.sort((a, b) => calculatePriority(b) - calculatePriority(a))
+        },
+        dailies(state) {
+            return state.todos.filter((t) => typeof t.dailyPrio === "number")
+                .sort((a, b) => calculatePriority(b) - calculatePriority(a))
+                .sort((a, b) => a.dailyPrio - b.dailyPrio)
         }
     },
     mutations: {
@@ -40,11 +45,15 @@ export default createStore({
                     console.warn("loading todos failed")
                     console.warn(e)
                 }
-            }
+            } else
+                console.info("no todos found in storage")
         },
-        addTask(state) {
+        addTask(state, payload) {
             const id = parseInt(localStorage.getItem('nextId') || "1")
-            state.todos.push({id: id, title: '', done: false})
+            const task = {id: id, title: '', done: false}
+            if (payload.daily)
+                task.dailyPrio = 0
+            state.todos.push(task)
             localStorage.setItem('nextId', "" + (id + 1))
             //saveTodos(state)
         },
@@ -57,6 +66,9 @@ export default createStore({
                     item[i] = payload[i]
             }
             saveTodos(state)
+        },
+        deleteTask(state, id) {
+            state.todos = state.todos.filter((t) => t.id !== id);
         }
     }
 })

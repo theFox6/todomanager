@@ -2,7 +2,7 @@
   "name": "todomanager",
   "author": "theFox6",
   "description": "A ToDo List Application that calculates Task Priority using various parameters.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

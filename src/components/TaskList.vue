@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <TaskItem v-for="t in todosSorted" :key="t.id" :id="t.id" @editTask="$emit('editTask', $event)"/>
+    <TaskItem v-for="t in todos" :key="t.id" :id="t.id" @editTask="$emit('editTask', $event)" :show-daily-prio="showDailyPrio" />
     <li><button class="add-item" @click="addTask">+</button></li>
   </ul>
 </template>
@@ -14,14 +14,20 @@ export default {
     TaskItem
   },
   emits: ["editTask"],
-  computed: {
-    todosSorted() {
-      return this.$store.getters.todosByPriority
+  props: {
+    todos: {
+      type: Array,
+      required: true
+    },
+    showDailyPrio: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   methods: {
     addTask() {
-      this.$store.commit('addTask')
+      this.$store.commit('addTask', {daily: this.showDailyPrio})
     }
   }
 }
@@ -30,7 +36,6 @@ export default {
 <style scoped>
 ul {
   list-style-type: none;
-  padding-left: 0;
 }
 .add-item {
   border: ridge #B7B7A4;

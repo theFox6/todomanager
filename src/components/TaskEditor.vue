@@ -4,6 +4,7 @@
     <p class="title"><AutoWidthInput v-model="title" placeholder="unnamed" /></p>
     <label>urgency:<input type="range" v-model.number="urgency" min="0" max="100" /><font-awesome-icon :icon="urgencyIcon" /> {{urgency}}%</label>
     <label>difficulty:<input type="range" v-model.number="difficulty" min="0" max="100" /><font-awesome-icon :icon="difficultyIcon" /> {{difficulty}}%</label>
+    <p class="setting"><label>do today:<input type="checkbox" v-model="isDaily"></label><label>with priority:<input type="number" v-model.number="dailyPrio" :disabled="!isDaily"></label></p>
   </div>
 </template>
 
@@ -42,6 +43,19 @@ export default {
     },
     difficultyIcon() {
       return this.difficulty < 25 ? "apple-whole" : this.difficulty < 50 ? "bag-shopping" : this.difficulty < 75 ? "person-digging" : "mountain"
+    },
+    dailyPrio: {
+      get() {return this.$store.getters.getTodoField(this.id, "dailyPrio")},
+      set(value) {this.$store.commit({type: 'updateTask', id: this.id, dailyPrio: value})}
+    },
+    isDaily: {
+      get() {return typeof this.dailyPrio === 'number' || typeof this.dailyPrio === 'string'},
+      set(daily) {
+        if (daily)
+          this.dailyPrio = 0
+        else
+          this.dailyPrio = false
+      }
     }
   }
 }
@@ -59,15 +73,29 @@ export default {
   text-align: center;
   font-size: large;
 }
-label {
+.setting {
   display: flex;
   justify-content: space-between;
   padding-left: 1em;
   padding-right: 1em;
 }
+label:not(p > label) {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+p > label {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
 label > input {
   display: flex;
   align-items: center;
+}
+input[type="checkbox"] {
+  min-width: 1em;
 }
 .close-button {
   text-align: right;
