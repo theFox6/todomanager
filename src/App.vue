@@ -3,8 +3,12 @@
     <p class="section-header"><font-awesome-icon icon="calendar-day" />Dailies<span /></p>
     <!--suppress JSValidateTypes -->
     <TaskList :todos="dailyTasks" @editTask="editTask" :show-daily-prio="true" />
+    <div v-if="anyOverdue">
+      <p class="section-header"><font-awesome-icon icon="exclamation-circle" />Overdue<span /></p>
+      <TaskList :todos="overdueTasks" @editTask="editTask" :show-daily-prio="true" :show-add-button="false" />
+    </div>
     <button @click="backlog = !backlog" class="section-header">
-      <font-awesome-icon icon="archive" /> Backlog <font-awesome-icon :icon="backlog ? 'angle-up' : 'angle-down'" />
+    <font-awesome-icon icon="archive" /> Backlog <font-awesome-icon :icon="backlog ? 'angle-up' : 'angle-down'" />
     </button>
     <!--suppress JSValidateTypes -->
     <TaskList v-if="backlog" :todos="todosSorted" @editTask="editTask" />
@@ -35,6 +39,12 @@ export default {
     },
     dailyTasks() {
       return this.$store.getters.dailies
+    },
+    overdueTasks() {
+      return this.$store.getters.overdueTodos
+    },
+    anyOverdue() {
+      return this.$store.getters.anyOverdue
     }
   },
   methods: {

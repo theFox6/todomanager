@@ -51,9 +51,11 @@ export default {
     isDaily: {
       get() {return typeof this.dailyPrio === 'number' || typeof this.dailyPrio === 'string'},
       set(daily) {
-        if (daily)
+        if (daily) {
           this.dailyPrio = 0
-        else
+          const date = new Date(Date.now())
+          this.$store.commit({type: "updateTask", id: this.id, dailyDate: [date.getDate(), date.getMonth(), date.getFullYear()]})
+        } else
           this.dailyPrio = false
       }
     }
@@ -63,7 +65,7 @@ export default {
 
 <style scoped>
 .dialog {
-  position: absolute;
+  position: fixed;
   top: 5%; left: 5%;
   height: 85%; width: 85%;
   background-color: #DDBEA9;

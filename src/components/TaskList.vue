@@ -1,7 +1,7 @@
 <template>
   <ul>
     <TaskItem v-for="t in todos" :key="t.id" :id="t.id" @editTask="$emit('editTask', $event)" :show-daily-prio="showDailyPrio" />
-    <li><button class="add-item" @click="addTask">+</button></li>
+    <li v-if="showAddButton"><button class="add-item" @click="addTask">+</button></li>
   </ul>
 </template>
 
@@ -23,6 +23,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    showAddButton: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   methods: {

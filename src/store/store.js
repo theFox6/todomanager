@@ -11,6 +11,13 @@ function calculatePriority(task) {
     return (task.urgency || 0) + (task.difficulty || 0)
 }
 
+function isOverdueFilter() {
+    const stamp = new Date(Date.now())
+    const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
+    return (task) => typeof task.dailyPrio === "number" &&
+        (task.dailyDate && date.some((v,i) => v !== task.dailyDate[i])) //does not account for future dates
+}
+
 export default createStore({
     state() {
         return {
@@ -31,9 +38,21 @@ export default createStore({
             return state.todos.sort((a, b) => calculatePriority(b) - calculatePriority(a))
         },
         dailies(state) {
-            return state.todos.filter((t) => typeof t.dailyPrio === "number")
+            const stamp = new Date(Date.now())
+            const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
+            const isDaily = (t) => typeof t.dailyPrio === "number" &&
+                ((!t.dailyDate) || date.every((v,i) => v === t.dailyDate[i]))
+            return state.todos.filter(isDaily)
                 .sort((a, b) => calculatePriority(b) - calculatePriority(a))
                 .sort((a, b) => a.dailyPrio - b.dailyPrio)
+        },
+        overdueTodos(state) {
+            return state.todos.filter(isOverdueFilter())
+                .sort((a, b) => calculatePriority(b) - calculatePriority(a))
+                .sort((a, b) => a.dailyPrio - b.dailyPrio)
+        },
+        anyOverdue(state) {
+            return state.todos.some(isOverdueFilter())
         }
     },
     mutations: {

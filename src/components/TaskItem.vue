@@ -52,12 +52,23 @@ export default {
       get() {return this.$store.getters.getTodoField(this.id, "dailyPrio")},
       set(value) {this.$store.commit({type: 'updateTask', id: this.id, dailyPrio: value})}
     },
+    dailyDate: {
+      get() {return this.$store.getters.getTodoField(this.id, "dailyDate")},
+      set(value) {this.$store.commit({type: "updateTask", id: this.id, dailyDate: value})}
+    },
     isDaily: {
-      get() {return typeof this.dailyPrio === 'number' || typeof this.dailyPrio === 'string'},
+      get() {
+        const stamp = new Date(Date.now())
+        const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
+        return (typeof this.dailyPrio === 'number' || typeof this.dailyPrio === 'string')
+            && (!this.dailyDate || date.every((v,i) => v !== this.dailyDate[i])) //doesn't account for future dates
+      },
       set(daily) {
-        if (daily)
+        if (daily) {
           this.dailyPrio = 0
-        else
+          const date = new Date(Date.now())
+          this.dailyDate = [date.getDate(), date.getMonth(), date.getFullYear()]
+        } else
           this.dailyPrio = false
       }
     },

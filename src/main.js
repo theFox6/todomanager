@@ -9,14 +9,14 @@ import {
     faFire, faPersonRunning, faPersonWalking, faHourglass,
     faBagShopping, faPersonDigging, faMountain, faAppleWhole,
     faBoxArchive, faAngleUp, faAngleDown,
-    faCalendarDay, faCalendarPlus, faCalendarXmark
+    faCalendarDay, faCalendarPlus, faCalendarXmark, faExclamationCircle
 } from '@fortawesome/free-solid-svg-icons'
 library.add(
     faPen, faXmark, faTrash,
     faFire, faPersonRunning, faPersonWalking, faHourglass,
     faBagShopping, faPersonDigging, faMountain, faAppleWhole,
     faBoxArchive, faAngleUp, faAngleDown,
-    faCalendarDay, faCalendarPlus, faCalendarXmark
+    faCalendarDay, faCalendarPlus, faCalendarXmark, faExclamationCircle
 )
 
 store.commit('initialize')
