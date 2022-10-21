@@ -14,7 +14,7 @@ function calculatePriority(task) {
 function isOverdueFilter() {
     const stamp = new Date(Date.now())
     const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
-    return (task) => typeof task.dailyPrio === "number" &&
+    return (task) => typeof task.dailyPrio === "number" && (!task.done) &&
         (task.dailyDate && date.some((v,i) => v !== task.dailyDate[i])) //does not account for future dates
 }
 

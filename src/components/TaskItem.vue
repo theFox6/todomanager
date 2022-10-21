@@ -41,11 +41,19 @@ export default {
         return this.$store.getters.getTodoField(this.id, "done")
       },
       set(value) {
-        this.$store.commit({
+        const data = {
           type: 'updateTask',
           id: this.id,
           done: value
-        })
+        }
+        const stamp = new Date(Date.now())
+        const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
+        const due = this.$store.getters.getTodoField(this.id, "dailyDate")
+        if (date.some((v,i) => v !== due[i])) {
+          data.dailyDate = false
+          data.dailyPrio = false
+        }
+        this.$store.commit(data)
       }
     },
     dailyPrio: {
