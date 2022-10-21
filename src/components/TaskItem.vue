@@ -69,7 +69,7 @@ export default {
         const stamp = new Date(Date.now())
         const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
         return (typeof this.dailyPrio === 'number' || typeof this.dailyPrio === 'string')
-            && (!this.dailyDate || date.every((v,i) => v !== this.dailyDate[i])) //doesn't account for future dates
+            && (!this.dailyDate || date.every((v,i) => v === this.dailyDate[i])) //doesn't account for future dates
       },
       set(daily) {
         if (daily) {
