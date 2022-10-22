@@ -9,6 +9,7 @@
     </span>
     <input type="checkbox" v-model="done"/>
     <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
+    <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
     <button @click="$emit('editTask', {id: this.id})"><FontAwesomeIcon icon="pen" /></button>
     <button><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" @click="isDaily = !isDaily" /></button>
     <button v-if="done" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
@@ -17,10 +18,12 @@
 
 <script>
 import AutoWidthInput from "@/components/AutoWidthInput";
+import ProgressCircle from "@/components/ProgressCircle";
 
 export default {
   name: "TaskItem",
   components: {
+    ProgressCircle,
     AutoWidthInput
   },
   emits: ['editTask'],
@@ -63,6 +66,10 @@ export default {
     dailyDate: {
       get() {return this.$store.getters.getTodoField(this.id, "dailyDate")},
       set(value) {this.$store.commit({type: "updateTask", id: this.id, dailyDate: value})}
+    },
+    progress: {
+      get() {return this.$store.getters.getTodoField(this.id, "progress")},
+      //set(value) {this.$store.commit({type: "updateTask", id: this.id, progress: value})}
     },
     isDaily: {
       get() {
@@ -107,7 +114,8 @@ li {
 }
 button {
   text-shadow: 1px 1px black;
-  margin-left: 3pt;
+  margin-left: 1pt;
+  margin-right: 1pt;
   border: none;
   padding-top: 3pt;
   padding-bottom: 3pt;

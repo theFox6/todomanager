@@ -21,9 +21,13 @@ export default {
 .input-auto {
   display: inline-block;
   position: relative;
+  margin-left: 2pt;
+  margin-right: 2pt;
 }
 .backing {
   display: inline-block;
+  padding-left: 1pt;
+  padding-right: .5pt;
   visibility: hidden;
 }
 .hidden-input {
