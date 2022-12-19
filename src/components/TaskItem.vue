@@ -9,10 +9,10 @@
     </span>
     <input type="checkbox" v-model="done"/>
     <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
-    <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
+    <ProgressCircle v-if="!done" :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
+    <button v-if="done" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
     <button @click="$emit('editTask', {id: this.id})"><FontAwesomeIcon icon="pen" /></button>
     <button><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" @click="isDaily = !isDaily" /></button>
-    <button v-if="done" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
   </li>
 </template>
 
@@ -52,7 +52,7 @@ export default {
         const stamp = new Date(Date.now())
         const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
         const due = this.$store.getters.getTodoField(this.id, "dailyDate")
-        if (date.some((v,i) => v !== due[i])) {
+        if (due && date.some((v,i) => v !== due[i])) {
           data.dailyDate = false
           data.dailyPrio = false
         }
