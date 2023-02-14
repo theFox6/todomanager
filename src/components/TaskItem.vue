@@ -7,9 +7,11 @@
         <button @click="dailyPrio++">&#9660;</button>
       </span>
     </span>
-    <input type="checkbox" v-model="done"/>
-    <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
+    <input v-if="showDailyPrio" type="checkbox" v-model="done"/>
+    <!--perhaps show the icon of the highest stat (urgency, difficulty, fear) or only the urgency icon-->
+    <!--TODO: maybe show the pen for editing when hovering over the progress circle-->
     <ProgressCircle v-if="!done" :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
+    <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
     <button v-if="done" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
     <button @click="$emit('editTask', {id: this.id})"><FontAwesomeIcon icon="pen" /></button>
     <button><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" @click="isDaily = !isDaily" /></button>
@@ -41,13 +43,13 @@ export default {
   computed: {
     done: {
       get() {
-        return this.$store.getters.getTodoField(this.id, "done")
+        return this.$store.getters.getTodoField(this.id, "dailyDone")
       },
       set(value) {
         const data = {
           type: 'updateTask',
           id: this.id,
-          done: value
+          dailyDone: value
         }
         const stamp = new Date(Date.now())
         const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]

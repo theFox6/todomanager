@@ -6,15 +6,18 @@ function saveTodos(state) {
 }
 
 function calculatePriority(task) {
-    if (task.done)
+    //TODO: estimate time needed based on progress, workload and difficulty
+    //      compare it to the time due and let urgency be the deciding factor
+    const p = task.progress || 0
+    if (p >= 100)
         return -1
-    return (task.urgency || 0) + (task.difficulty || 0)
+    return (task.urgency || 0) + (task.difficulty || 0) / Math.max(p / 10, 1)
 }
 
 function isOverdueFilter() {
     const stamp = new Date(Date.now())
     const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
-    return (task) => typeof task.dailyPrio === "number" && (!task.done) &&
+    return (task) => typeof task.dailyPrio === "number" && (!task.dailyDone) &&
         (task.dailyDate && date.some((v,i) => v !== task.dailyDate[i])) //does not account for future dates
 }
 
@@ -69,9 +72,11 @@ export default createStore({
         },
         addTask(state, payload) {
             const id = parseInt(localStorage.getItem('nextId') || "1")
-            const task = {id: id, title: '', done: false}
-            if (payload.daily)
+            const task = {id: id, title: '', progress: 0}
+            if (payload.daily) {
                 task.dailyPrio = 0
+                task.dailyDone = false
+            }
             state.todos.push(task)
             localStorage.setItem('nextId', "" + (id + 1))
             //saveTodos(state)
