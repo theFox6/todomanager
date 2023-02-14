@@ -10,9 +10,9 @@
     <input v-if="showDailyPrio" type="checkbox" v-model="done"/>
     <!--perhaps show the icon of the highest stat (urgency, difficulty, fear) or only the urgency icon-->
     <!--TODO: maybe show the pen for editing when hovering over the progress circle-->
-    <ProgressCircle v-if="!done" :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
+    <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
     <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
-    <button v-if="done" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
+    <button v-if="progress >= 100" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
     <button @click="$emit('editTask', {id: this.id})"><FontAwesomeIcon icon="pen" /></button>
     <button><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" @click="isDaily = !isDaily" /></button>
   </li>
