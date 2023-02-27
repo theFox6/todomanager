@@ -12,7 +12,8 @@
     <!--TODO: maybe show the pen for editing when hovering over the progress circle-->
     <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
     <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
-    <button v-if="progress >= 100" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
+    <button v-if="!showDailyPrio && progress < 100" @click="progress = 100"><FontAwesomeIcon icon="check" /></button>
+    <button v-else-if="progress >= 100" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
     <button @click="$emit('editTask', {id: this.id})"><FontAwesomeIcon icon="pen" /></button>
     <button><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" @click="isDaily = !isDaily" /></button>
   </li>
@@ -71,7 +72,7 @@ export default {
     },
     progress: {
       get() {return this.$store.getters.getTodoField(this.id, "progress")},
-      //set(value) {this.$store.commit({type: "updateTask", id: this.id, progress: value})}
+      set(value) {this.$store.commit({type: "updateTask", id: this.id, progress: value})}
     },
     isDaily: {
       get() {
@@ -85,6 +86,7 @@ export default {
           this.dailyPrio = 0
           const date = new Date(Date.now())
           this.dailyDate = [date.getDate(), date.getMonth(), date.getFullYear()]
+          this.done = false
         } else
           this.dailyPrio = false
       }
