@@ -10,7 +10,7 @@
     <input v-if="showDailyPrio" type="checkbox" v-model="done"/>
     <!--perhaps show the icon of the highest stat (urgency, difficulty, fear) or only the urgency icon-->
     <!--TODO: maybe show the pen for editing when hovering over the progress circle-->
-    <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" />
+    <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" :status-color="statusColor" />
     <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
     <button v-if="!showDailyPrio && progress < 100" @click="progress = 100"><FontAwesomeIcon icon="check" /></button>
     <button v-else-if="progress >= 100" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
@@ -72,7 +72,12 @@ export default {
     },
     progress: {
       get() {return this.$store.getters.getTodoField(this.id, "progress")},
-      set(value) {this.$store.commit({type: "updateTask", id: this.id, progress: value})}
+      set(value) {
+        const update = {type: "updateTask", id: this.id, progress: value}
+        if (value === 100 && this.statusColor)
+          update.bufferDays = null
+        this.$store.commit(update)
+      }
     },
     isDaily: {
       get() {
@@ -87,8 +92,9 @@ export default {
           const date = new Date(Date.now())
           this.dailyDate = [date.getDate(), date.getMonth(), date.getFullYear()]
           this.done = false
-        } else
+        } else {
           this.dailyPrio = false
+        }
       }
     },
     title: {
@@ -101,6 +107,17 @@ export default {
           id: this.id,
           title: value
         })
+      }
+    },
+    statusColor: {
+      get() {
+        const buffer = this.$store.getters.getTodoField(this.id, "bufferDays") ?? -1
+        return buffer < 0 ? undefined :
+            buffer === 0 ? "black" : //magenta would work too
+            buffer === 1 ? "red" :
+            buffer === 2 ? "gold" :
+            buffer === 3 ? "limegreen" :
+            "#0089ff"
       }
     }
   },

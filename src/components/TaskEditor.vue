@@ -6,6 +6,7 @@
     <label>urgency:<input type="range" v-model.number="urgency" min="0" max="100" /><font-awesome-icon :icon="urgencyIcon" /> {{urgency}}%</label>
     <label>difficulty:<input type="range" v-model.number="difficulty" min="0" max="100" /><font-awesome-icon :icon="difficultyIcon" /> {{difficulty}}%</label>
     <p class="setting"><label>do today:<input type="checkbox" v-model="isDaily"></label><label>with priority:<input type="number" v-model.number="dailyPrio" :disabled="!isDaily"></label></p>
+    <p class="setting"><label>days left to fulfill:<input type="number" v-model.number="bufferDays"></label></p>
   </div>
 </template>
 
@@ -41,7 +42,12 @@ export default {
     },
     progress: {
       get() {return this.$store.getters.getTodoField(this.id, "progress") || 0},
-      set(value) {this.$store.commit({type: 'updateTask', id: this.id, progress: value})}
+      set(value) {
+        const update = {type: "updateTask", id: this.id, progress: value}
+        if (value === 100 && (this.bufferDays ?? -1) >= 0)
+          update.bufferDays = null
+        this.$store.commit(update)
+      }
     },
     urgencyIcon() {
       return this.urgency < 25 ? "hourglass" : this.urgency < 50 ? "person-walking" : this.urgency < 75 ? "person-running" : "fire"
@@ -64,8 +70,24 @@ export default {
           this.dailyPrio = 0
           const date = new Date(Date.now())
           this.$store.commit({type: "updateTask", id: this.id, dailyDate: [date.getDate(), date.getMonth(), date.getFullYear()]})
-        } else
+        } else {
           this.dailyPrio = false
+        }
+      }
+    },
+    bufferDays: {
+      get() {return this.$store.getters.getTodoField(this.id, "bufferDays")},
+      set(value) {
+        if (typeof value === "number") {
+          const date = new Date(Date.now())
+          this.$store.commit({
+            type: 'updateTask', id: this.id,
+            bufferDays: value, referenceDate: [date.getDate(), date.getMonth(), date.getFullYear()]
+          })
+        } else if (value === "")
+          this.$store.commit({type: 'updateTask', id: this.id, bufferDays: null})
+        else
+          console.info("invalid number of days left:", value)
       }
     }
   }

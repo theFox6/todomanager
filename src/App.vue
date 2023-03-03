@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!--perhaps add a background around sections-->
     <p class="section-header"><font-awesome-icon icon="calendar-day" />Dailies<span /></p>
     <!--suppress JSValidateTypes -->
     <TaskList :todos="dailyTasks" @editTask="editTask" :show-daily-prio="true" />
@@ -12,6 +13,8 @@
     </button>
     <!--suppress JSValidateTypes -->
     <TaskList v-if="backlog" :todos="todosSorted" @editTask="editTask" />
+    <p class="section-header"><font-awesome-icon icon="gears" />Actions<span /></p>
+    <ActionBar />
     <TaskEditor v-if="editingTask" :id="taskToEdit" @closeEditor="editingTask = false" />
   </div>
 </template>
@@ -19,10 +22,12 @@
 <script>
 import TaskList from "@/components/TaskList";
 import TaskEditor from "@/components/TaskEditor";
+import ActionBar from "@/components/ActionBar.vue";
 
 export default {
   name: 'App',
   components: {
+    ActionBar,
     TaskList,
     TaskEditor
   },

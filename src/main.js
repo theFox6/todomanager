@@ -5,6 +5,7 @@ import icons from "./icons.js"
 
 icons.init()
 store.commit('initialize')
+store.dispatch('update').catch((e) => console.error(e))
 
 const app = createApp(App)
 icons.component(app)

@@ -28,8 +28,14 @@ export default createStore({
         }
     },
     getters: {
+        dataString(state) {
+            return JSON.stringify(state.todos)
+        },
         todosCount(state) {
             return state.todos.length
+        },
+        todosIDs(state) {
+          return state.todos.map((t) => t.id)
         },
         getTodoField: (state) => (id, fieldName) => {
             const item = state.todos.find((t) => t.id === id)
@@ -45,6 +51,7 @@ export default createStore({
             const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
             const isDaily = (t) => typeof t.dailyPrio === "number" &&
                 ((!t.dailyDate) || date.every((v,i) => v === t.dailyDate[i]))
+            //TODO: take daily done into account as well
             return state.todos.filter(isDaily)
                 .sort((a, b) => calculatePriority(b) - calculatePriority(a))
                 .sort((a, b) => a.dailyPrio - b.dailyPrio)
@@ -93,6 +100,39 @@ export default createStore({
         },
         deleteTask(state, id) {
             state.todos = state.todos.filter((t) => t.id !== id);
+        }
+    },
+    actions: {
+        update(context) {
+            const date = new Date(Date.now())
+            //console.log("today is", date)
+            for (const id of context.getters.todosIDs) {
+                if (!id) {
+                    console.error("todo without id")
+                    continue
+                }
+                let ref = context.getters.getTodoField(id, "referenceDate")
+                if (!ref)
+                    continue
+                ref = new Date(ref[2], ref[1], ref[0])
+                //console.log("to do", id, "has reference date", ref)
+                const MS_PER_DAY = 1000 * 60 * 60 * 24
+                const daysPassed = Math.floor((date - ref) / MS_PER_DAY)
+                //console.log("to do", id, "passed", daysPassed, "days")
+                if (daysPassed === 0)
+                    continue
+                const update = {
+                    type: 'updateTask', id: id,
+                    referenceDate: [date.getDate(), date.getMonth(), date.getFullYear()]
+                }
+
+                const buf = context.getters.getTodoField(id, "bufferDays")
+                if (buf > -1)
+                    update.bufferDays = Math.max(buf - daysPassed, 0)
+
+                //console.log("commiting update", update)
+                context.commit(update)
+            }
         }
     }
 })

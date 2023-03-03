@@ -19,6 +19,15 @@
         :stroke-dasharray="maxValue"
         :stroke-dashoffset="fillerOffset"
     />
+
+    <circle
+        v-if="statusColor"
+        cx="60"
+        cy="60"
+        r="30"
+        :fill="statusColor"
+        stroke="none"
+    />
   </svg>
 </template>
 
@@ -37,6 +46,10 @@ export default {
     maxValue: {
       type: Number,
       default: 100
+    },
+    statusColor: {
+      type: String,
+      required: false
     }
   },
   computed: {
