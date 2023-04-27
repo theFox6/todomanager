@@ -94,6 +94,9 @@ export default {
           this.done = false
         } else {
           this.dailyPrio = false
+          //perhaps add a setting whether this should happen when the task is done or daily done
+          if (this.statusColor)
+            this.$store.commit({type: 'updateTask', id: this.id, bufferDays: null})
         }
       }
     },

@@ -11,7 +11,9 @@ function calculatePriority(task) {
     const p = task.progress || 0
     if (p >= 100)
         return -1
-    return (task.urgency || 0) + (task.difficulty || 0) / Math.max(p / 10, 1)
+    const stats = (task.urgency || 0) + (task.difficulty || 0)
+    const buffFactor = task.bufferDays ? 1 + 1 / task.bufferDays : 1
+    return stats * buffFactor / Math.max(p / 10, 1)
 }
 
 function isOverdueFilter() {
