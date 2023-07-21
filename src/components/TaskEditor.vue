@@ -2,11 +2,12 @@
   <div class="dialog">
     <p class="close-button" @click="$emit('closeEditor')"><button><font-awesome-icon icon="xmark" /></button></p>
     <p class="title"><AutoWidthInput v-model="title" placeholder="unnamed" /></p>
-    <label>progress:<input type="range" v-model.number="progress" min="0" max="100" /><font-awesome-icon :icon="progressIcon" /> {{progress}}%</label>
-    <label>urgency:<input type="range" v-model.number="urgency" min="0" max="100" /><font-awesome-icon :icon="urgencyIcon" /> {{urgency}}%</label>
-    <label>difficulty:<input type="range" v-model.number="difficulty" min="0" max="100" /><font-awesome-icon :icon="difficultyIcon" /> {{difficulty}}%</label>
-    <p class="setting"><label>do today:<input type="checkbox" v-model="isDaily"></label><label>with priority:<input type="number" v-model.number="dailyPrio" :disabled="!isDaily"></label></p>
-    <p class="setting"><label>days left to fulfill:<input type="number" v-model.number="bufferDays"></label></p>
+    <label>progress:<input v-model.number="progress" type="range" min="0" max="100" /><font-awesome-icon :icon="progressIcon" /> {{ progress }}%</label>
+    <label>urgency:<input v-model.number="urgency" type="range" min="0" max="100" /><font-awesome-icon :icon="urgencyIcon" /> {{ urgency }}%</label>
+    <label>difficulty:<input v-model.number="difficulty" type="range" min="0" max="100" /><font-awesome-icon :icon="difficultyIcon" /> {{ difficulty }}%</label>
+    <p class="setting"><label>do today:<input v-model="isDaily" type="checkbox" /></label><label>with priority:<input v-model.number="dailyPrio" type="number" :disabled="!isDaily" /></label></p>
+    <p class="setting"><label>days left to fulfill:<input v-model.number="bufferDays" type="number" /></label></p>
+    <!--ToDo: add a selection for archiving-->
   </div>
 </template>
 
@@ -15,10 +16,13 @@ import AutoWidthInput from "@/components/AutoWidthInput";
 export default {
   name: "TaskEditor",
   components: {AutoWidthInput},
-  emits: ["closeEditor"],
   props: {
-    id: Number
+    id: {
+      type: Number,
+      required: true
+    },
   },
+  emits: ["closeEditor"],
   computed: {
     title: {
       get() {

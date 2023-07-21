@@ -5,8 +5,8 @@ import {
     faFire, faPersonRunning, faPersonWalking, faHourglass,
     faBagShopping, faPersonDigging, faMountain, faAppleWhole,
     faClipboardList, faHammer, faMagnifyingGlass, faScrewdriverWrench,
-    faBoxArchive, faFileExport,
-    faAngleUp, faAngleDown, faExclamationCircle,
+    faBoxArchive, faFileExport, faBoxesStacked,
+    faAngleUp, faAngleDown, faExclamationCircle, faArrowUp,
     faCalendarDay, faCalendarPlus, faCalendarXmark
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -17,8 +17,8 @@ export default {
             faFire, faPersonRunning, faPersonWalking, faHourglass,
             faBagShopping, faPersonDigging, faMountain, faAppleWhole,
             faClipboardList, faHammer, faMagnifyingGlass, faScrewdriverWrench,
-            faBoxArchive, faFileExport,
-            faAngleUp, faAngleDown, faExclamationCircle,
+            faBoxArchive, faFileExport, faBoxesStacked,
+            faAngleUp, faAngleDown, faExclamationCircle, faArrowUp,
             faCalendarDay, faCalendarPlus, faCalendarXmark
         )
     },

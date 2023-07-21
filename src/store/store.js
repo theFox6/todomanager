@@ -24,6 +24,10 @@ function isOverdueFilter() {
 }
 
 export default createStore({
+    /**
+     * creates the initial state of the store
+     * @return {{todos: TodoManager.Task[]}}
+     */
     state() {
         return {
             todos: []
@@ -36,6 +40,11 @@ export default createStore({
         todosCount(state) {
             return state.todos.length
         },
+        /**
+         * returns an array containing the IDs of all Todos
+         * @param state the state of the store
+         * @return {number[]}
+         */
         todosIDs(state) {
           return state.todos.map((t) => t.id)
         },
@@ -45,9 +54,20 @@ export default createStore({
                 return item[fieldName]
             return undefined
         },
+        /**
+         * gets all todos sorted by priority
+         * @deprecated use filtering getters instead to exclude archived Todos
+         * @param state the state of the store
+         * @return {TodoManager.Task[]}
+         */
         todosByPriority(state) {
             return state.todos.sort((a, b) => calculatePriority(b) - calculatePriority(a))
         },
+        /**
+         * gets all tasks that are marked daily
+         * @param state the state of the store
+         * @return {TodoManager.Task[]}
+         */
         dailies(state) {
             const stamp = new Date(Date.now())
             const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
@@ -62,6 +82,14 @@ export default createStore({
             return state.todos.filter(isOverdueFilter())
                 .sort((a, b) => calculatePriority(b) - calculatePriority(a))
                 .sort((a, b) => a.dailyPrio - b.dailyPrio)
+        },
+        backlogTodos(state) {
+            return state.todos.filter((task) => !task.archived)
+                .sort((a, b) => calculatePriority(a) - calculatePriority(b))
+        },
+        //TODO: change to todosByArchive
+        archivedTodos(state) {
+            return state.todos.filter((task) => task.archived)
         },
         anyOverdue(state) {
             return state.todos.some(isOverdueFilter())

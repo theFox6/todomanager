@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "plugin:vue/recommended"
+  ],
+  "ignorePatterns": ["*.d.ts"],
+  "rules": {
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/max-attributes-per-line": ["warn", {
+      "singleline": {
+        "max": 5
+      },
+      "multiline": {
+        "max": 2
+      }
+    }],
+    "vue/html-self-closing": ["error", {
+      "html": {
+        "void": "always"
+      }
+    }]
+  }
+}

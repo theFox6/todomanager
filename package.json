@@ -2,7 +2,7 @@
   "name": "todomanager",
   "author": "theFox6",
   "description": "A ToDo List Application that calculates Task Priority using various parameters.",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -29,8 +29,8 @@
     "babel-eslint": "^10.1.0",
     "electron": "^23.0.0",
     "electron-devtools-installer": "^3.2.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
+    "eslint": "^8.45.0",
+    "eslint-plugin-vue": "^9.15.1",
     "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-template-compiler": "^2.6.11"
   },

@@ -3,16 +3,21 @@
     <!--perhaps add a background around sections-->
     <p class="section-header"><font-awesome-icon icon="calendar-day" />Dailies<span /></p>
     <!--suppress JSValidateTypes -->
-    <TaskList :todos="dailyTasks" @editTask="editTask" :show-daily-prio="true" />
+    <TaskList :todos="dailyTasks" :show-daily-prio="true" @editTask="editTask" />
     <div v-if="anyOverdue">
       <p class="section-header"><font-awesome-icon icon="exclamation-circle" />Overdue<span /></p>
-      <TaskList :todos="overdueTasks" @editTask="editTask" :show-daily-prio="true" :show-add-button="false" />
+      <TaskList :todos="overdueTasks" :show-daily-prio="true" :show-add-button="false" @editTask="editTask" />
     </div>
-    <button @click="backlog = !backlog" class="section-header">
-    <font-awesome-icon icon="archive" /> Backlog <font-awesome-icon :icon="backlog ? 'angle-up' : 'angle-down'" />
+    <button class="section-header" @click="backlog = !backlog">
+      <font-awesome-icon icon="archive" /> Backlog <font-awesome-icon :icon="backlog ? 'angle-up' : 'angle-down'" />
     </button>
     <!--suppress JSValidateTypes -->
-    <TaskList v-if="backlog" :todos="todosSorted" @editTask="editTask" />
+    <TaskList v-if="backlog" :todos="todosBacklog" @editTask="editTask" />
+    <button class="section-header" @click="listArchives = !listArchives">
+      <font-awesome-icon icon="boxes-stacked" /> Archived <font-awesome-icon :icon="listArchives ? 'angle-up' : 'angle-down'" />
+    </button>
+    <!--TODO: list archives individually-->
+    <TaskList v-if="listArchives" :todos="todosArchived" :show-add-button="false" @edit-task="editTask" />
     <p class="section-header"><font-awesome-icon icon="gears" />Actions<span /></p>
     <ActionBar />
     <TaskEditor v-if="editingTask" :id="taskToEdit" @closeEditor="editingTask = false" />
@@ -34,17 +39,25 @@ export default {
   data() {
     return {
       backlog: false,
+      listArchives: false,
       editingTask: false,
       taskToEdit: 0
     }
   },
   computed: {
-    todosSorted() {
-      return this.$store.getters.todosByPriority
+    todosBacklog() {
+      return this.$store.getters.backlogTodos
     },
     dailyTasks() {
       return this.$store.getters.dailies
     },
+    todosArchived() {
+      return this.$store.getters.archivedTodos
+    },
+    /**
+     * lists the overdue tasks
+     * @return {TodoManager.Task[]}
+     */
     overdueTasks() {
       return this.$store.getters.overdueTodos
     },
@@ -53,6 +66,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * opens the editor for a specific task
+     * @param e {TodoManager.Task} the task to edit
+     */
     editTask(e) {
       this.taskToEdit = e.id
       this.editingTask = true

@@ -1,21 +1,22 @@
 <template>
   <li>
     <span v-if="showDailyPrio" style="display: inline-flex">
-      <input type="number" v-model.number.lazy="dailyPrio" class="daily-prio" />
+      <input v-model.number.lazy="dailyPrio" type="number" class="daily-prio" />
       <span class="small-buttons" style="display: inline-grid">
-        <button @click="dailyPrio--">&#9650;</button>
-        <button @click="dailyPrio++">&#9660;</button>
+        <button title="list earlier" @click="dailyPrio--">&#9650;</button>
+        <button title="list later" @click="dailyPrio++">&#9660;</button>
       </span>
     </span>
-    <input v-if="showDailyPrio" type="checkbox" v-model="done"/>
+    <input v-if="showDailyPrio" v-model="done" type="checkbox" title="done for today" />
     <!--perhaps show the icon of the highest stat (urgency, difficulty, fear) or only the urgency icon-->
     <!--TODO: maybe show the pen for editing when hovering over the progress circle-->
     <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" :status-color="statusColor" />
-    <AutoWidthInput type="text" v-model="title" placeholder="unnamed" />
-    <button v-if="!showDailyPrio && progress < 100" @click="progress = 100"><FontAwesomeIcon icon="check" /></button>
-    <button v-else-if="progress >= 100" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
-    <button @click="$emit('editTask', {id: this.id})"><FontAwesomeIcon icon="pen" /></button>
-    <button><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" @click="isDaily = !isDaily" /></button>
+    <AutoWidthInput v-model="title" type="text" placeholder="unnamed" />
+    <button v-if="!showDailyPrio && progress < 100" title="finish" @click="progress = 100"><FontAwesomeIcon icon="check" /></button>
+    <button v-else-if="progress >= 100" title="delete" @click="deleteTask"><FontAwesomeIcon icon="trash" /></button>
+    <button title="edit" @click="$emit('editTask', {id: id})"><FontAwesomeIcon icon="pen" /></button>
+    <button :title="isDaily ? 'remove from dailies' : 'add to dailies'" @click="isDaily = !isDaily"><font-awesome-icon :icon="isDaily ? 'calendar-xmark' : 'calendar-plus'" /></button>
+    <button :title="archive ? 'retrieve' : 'archive'" @click="archive ? (archive = false) : (archive = 'default')"><font-awesome-icon :icon="archive ? 'arrow-up' : 'archive'" /></button>
   </li>
 </template>
 
@@ -29,7 +30,6 @@ export default {
     ProgressCircle,
     AutoWidthInput
   },
-  emits: ['editTask'],
   props: {
     id: {
       type: Number,
@@ -41,6 +41,7 @@ export default {
       default: false
     }
   },
+  emits: ['editTask'],
   computed: {
     done: {
       get() {
@@ -109,6 +110,18 @@ export default {
           type: 'updateTask',
           id: this.id,
           title: value
+        })
+      }
+    },
+    archive: {
+      get() {
+        return this.$store.getters.getTodoField(this.id, "archived")
+      },
+      set(value) {
+        this.$store.commit({
+          type: 'updateTask',
+          id: this.id,
+          archived: value
         })
       }
     },
