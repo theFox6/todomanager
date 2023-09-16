@@ -1,4 +1,8 @@
 declare namespace TodoManager {
+    /**
+     * a To Do-Manager task
+     * contains information about task, schedule, progress and difficulty
+     */
     interface Task {
         //general fields
         id: number,
@@ -7,6 +11,7 @@ declare namespace TodoManager {
         //priority parameters
         urgency?: number,
         difficulty?: number,
+        reluctance?: number,
         //days left to fulfill
         bufferDays?: number,
         referenceDate?: number,

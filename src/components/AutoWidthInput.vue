@@ -1,8 +1,9 @@
 <template>
   <span class="input-auto">
-    <span class="backing">{{(modelValue === "" ? $props.placeholder : modelValue).replaceAll(' ','|')}} </span>
-    <input class="hidden-input" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)"
-           :placeholder="$props.placeholder"/>
+    <span class="backing">{{ (modelValue === "" ? $props.placeholder : modelValue).replaceAll(' ','|') }} </span>
+    <input class="hidden-input" :value="modelValue"
+           :placeholder="$props.placeholder"
+           @input="$emit('update:modelValue', $event.target.value)"/>
   </span>
 </template>
 
@@ -10,8 +11,14 @@
 export default {
   name: "AutoWidthInput",
   props: {
-    placeholder: String,
-    modelValue: String
+    placeholder: {
+      type: String,
+      default: ""
+    },
+    modelValue: {
+      type: String,
+      required: true
+    }
   },
   emits: ['update:modelValue']
 }

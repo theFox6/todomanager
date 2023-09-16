@@ -7,7 +7,8 @@ import {
     faClipboardList, faHammer, faMagnifyingGlass, faScrewdriverWrench,
     faBoxArchive, faFileExport, faBoxesStacked,
     faAngleUp, faAngleDown, faExclamationCircle, faArrowUp,
-    faCalendarDay, faCalendarPlus, faCalendarXmark
+    faCalendarDay, faCalendarPlus, faCalendarXmark,
+    faFaceLaughWink, faFaceSmile, faFaceMeh, faFaceGrimace, faFaceTired
 } from '@fortawesome/free-solid-svg-icons'
 
 export default {
@@ -19,7 +20,8 @@ export default {
             faClipboardList, faHammer, faMagnifyingGlass, faScrewdriverWrench,
             faBoxArchive, faFileExport, faBoxesStacked,
             faAngleUp, faAngleDown, faExclamationCircle, faArrowUp,
-            faCalendarDay, faCalendarPlus, faCalendarXmark
+            faCalendarDay, faCalendarPlus, faCalendarXmark,
+            faFaceLaughWink, faFaceSmile, faFaceMeh, faFaceGrimace, faFaceTired
         )
     },
     component(app) {

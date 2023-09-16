@@ -1,10 +1,12 @@
 <template>
   <div class="dialog">
-    <p class="close-button" @click="$emit('closeEditor')"><button><font-awesome-icon icon="xmark" /></button></p>
-    <p class="title"><AutoWidthInput v-model="title" placeholder="unnamed" /></p>
-    <label>progress:<input v-model.number="progress" type="range" min="0" max="100" /><font-awesome-icon :icon="progressIcon" /> {{ progress }}%</label>
-    <label>urgency:<input v-model.number="urgency" type="range" min="0" max="100" /><font-awesome-icon :icon="urgencyIcon" /> {{ urgency }}%</label>
-    <label>difficulty:<input v-model.number="difficulty" type="range" min="0" max="100" /><font-awesome-icon :icon="difficultyIcon" /> {{ difficulty }}%</label>
+    <p class="title"><span /><AutoWidthInput v-model="title" placeholder="unnamed" class="push-down" /><button @click="$emit('closeEditor')"><font-awesome-icon icon="xmark" /></button></p>
+    <table class="parameter-table">
+      <tr><td>progress:</td><td><input v-model.number="progress" type="range" min="0" max="100" /></td><td><font-awesome-icon :icon="progressIcon" /></td><td>{{ progress }}%</td></tr>
+      <tr><td>urgency:</td><td><input v-model.number="urgency" type="range" min="0" max="100" /></td><td><font-awesome-icon :icon="urgencyIcon" /></td><td>{{ urgency }}%</td></tr>
+      <tr><td>difficulty:</td><td><input v-model.number="difficulty" type="range" min="0" max="100" /></td><td><font-awesome-icon :icon="difficultyIcon" /></td><td>{{ difficulty }}%</td></tr>
+      <tr><td>reluctance:</td><td><input v-model.number="reluctance" type="range" min="0" max="100" /></td><td><font-awesome-icon :icon="reluctanceIcon" /></td><td>{{ reluctance }}%</td></tr>
+    </table>
     <p class="setting"><label>do today:<input v-model="isDaily" type="checkbox" /></label><label>with priority:<input v-model.number="dailyPrio" type="number" :disabled="!isDaily" /></label></p>
     <p class="setting"><label>days left to fulfill:<input v-model.number="bufferDays" type="number" /></label></p>
     <!--ToDo: add a selection for archiving-->
@@ -44,6 +46,10 @@ export default {
       get() {return this.$store.getters.getTodoField(this.id, "difficulty") || 0},
       set(value) {this.$store.commit({type: 'updateTask', id: this.id, difficulty: value})}
     },
+    reluctance: {
+      get() {return this.$store.getters.getTodoField(this.id, "reluctance") || 0},
+      set(value) {this.$store.commit({type: 'updateTask', id: this.id, reluctance: value})}
+    },
     progress: {
       get() {return this.$store.getters.getTodoField(this.id, "progress") || 0},
       set(value) {
@@ -58,6 +64,10 @@ export default {
     },
     difficultyIcon() {
       return this.difficulty < 25 ? "apple-whole" : this.difficulty < 50 ? "bag-shopping" : this.difficulty < 75 ? "person-digging" : "mountain"
+    },
+    reluctanceIcon() {
+      return this.reluctance < 20 ? "face-laugh-wink" : this.reluctance < 40 ? "face-smile" :
+          this.reluctance < 60 ? "face-meh" : this.reluctance < 80 ? "face-grimace" : "face-tired";
     },
     progressIcon() {
       return this.progress < 25 ? "clipboard-list" : this.progress < 50 ? "person-digging" : this.progress < 75 ? "hammer" :
@@ -99,16 +109,27 @@ export default {
 </script>
 
 <style scoped>
+button {
+  border: ridge #CB997E;
+  padding: 3pt 6pt;
+  height: fit-content;
+}
+
 .dialog {
   position: fixed;
   top: 5%; left: 5%;
   height: 85%; width: 85%;
   background-color: #DDBEA9;
-  padding: 1em;
+  padding-left: 1em;
+  padding-right: 1em;
 }
 .title {
+  display: flex;
+  justify-content: space-between;
   text-align: center;
   font-size: large;
+  min-height: min-content;
+  height: 3rem;
 }
 .setting {
   display: flex;
@@ -116,6 +137,10 @@ export default {
   padding-left: 1em;
   padding-right: 1em;
 }
+.push-down {
+  margin-top: auto;
+}
+
 label:not(p > label) {
   display: flex;
   justify-content: space-between;
@@ -124,25 +149,24 @@ label:not(p > label) {
 }
 p > label {
   display: flex;
-  justify-content: space-between;
   width: 100%;
+  & input {
+    margin-left: 1em;
+    margin-right: 1em;
+  }
 }
-label > input {
-  display: flex;
-  align-items: center;
-}
-input[type="checkbox"] {
-  min-width: 1em;
-}
-.close-button {
-  text-align: right;
-  margin-top: 0;
-}
-.close-button > button {
-  border: ridge #CB997E;
-  padding: 3pt 6pt;
-}
-input {
-  width: 60%;
+
+.parameter-table {
+  width: 100%;
+  & td {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  & input {
+    width: 100%;
+  }
+  & td:has(input) {
+    width: 100%;
+  }
 }
 </style>

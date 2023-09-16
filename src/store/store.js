@@ -5,15 +5,22 @@ function saveTodos(state) {
     localStorage.setItem('todos', JSON.stringify(state.todos))
 }
 
+/**
+ * calculates the priority of the task based on its parameters
+ *
+ * a more important task gets a greater priority number
+ * @param task {TodoManager.Task} the task to be evaluated
+ * @return {number} a number representing the tasks priority
+ */
 function calculatePriority(task) {
     //TODO: estimate time needed based on progress, workload and difficulty
     //      compare it to the time due and let urgency be the deciding factor
     const p = task.progress || 0
     if (p >= 100)
         return -1
-    const stats = (task.urgency || 0) + (task.difficulty || 0)
+    const stats = (task.urgency || 0) + (task.difficulty || 0) + (task.reluctance || 0)
     const buffFactor = task.bufferDays ? 1 + 1 / task.bufferDays : 1
-    return stats * buffFactor / Math.max(p / 10, 1)
+    return stats * buffFactor / (1 + p / 50)
 }
 
 function isOverdueFilter() {
@@ -85,7 +92,7 @@ export default createStore({
         },
         backlogTodos(state) {
             return state.todos.filter((task) => !task.archived)
-                .sort((a, b) => calculatePriority(a) - calculatePriority(b))
+                .sort((a, b) => calculatePriority(b) - calculatePriority(a))
         },
         //TODO: change to todosByArchive
         archivedTodos(state) {

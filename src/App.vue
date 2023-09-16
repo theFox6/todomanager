@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!--TODO: only show archive button in backlog and archive-->
     <!--perhaps add a background around sections-->
     <p class="section-header"><font-awesome-icon icon="calendar-day" />Dailies<span /></p>
     <!--suppress JSValidateTypes -->
@@ -13,6 +14,7 @@
     </button>
     <!--suppress JSValidateTypes -->
     <TaskList v-if="backlog" :todos="todosBacklog" @editTask="editTask" />
+    <!--TODO: add some space even when backlog is collapsed-->
     <button class="section-header" @click="listArchives = !listArchives">
       <font-awesome-icon icon="boxes-stacked" /> Archived <font-awesome-icon :icon="listArchives ? 'angle-up' : 'angle-down'" />
     </button>
@@ -96,6 +98,7 @@ button {
   border: ridge #B7B7A4;
   font-weight: bold;
   font-size: large;
+  margin-top: 1em;
 }
 button.section-header {
   width: 100%;
