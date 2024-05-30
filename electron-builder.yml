@@ -1,0 +1,13 @@
+appId: com.theFox6.todomanager
+productName: ToDo Manager
+icon: resources/todo-manager.png
+linux:
+  target:
+    - AppImage
+    - snap
+    - deb
+  category: Office
+  icon: resources/todo-manager.png
+  maintainer: theFox6
+appImage:
+  artifactName: ${name}-${version}.${ext}

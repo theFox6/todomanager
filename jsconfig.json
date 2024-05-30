@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@resources": ["resources"],
+      "@resources/*": ["resources/*"],
+      "@renderer": ["src/renderer/src"],
+      "@renderer/*": ["src/renderer/src/*"]
+    }
+  }
+}

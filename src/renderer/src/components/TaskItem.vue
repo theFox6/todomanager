@@ -9,7 +9,7 @@
     </span>
     <input v-if="showDailyPrio" v-model="done" type="checkbox" title="done for today" />
     <!--perhaps show the icon of the highest stat (urgency, difficulty, fear) or only the urgency icon-->
-    <!--TODO: maybe show the pen for editing when hovering over the progress circle-->
+    <!--perhaps show the pen for editing when hovering over the progress circle-->
     <ProgressCircle :percent="progress" style="margin-left: 3pt; margin-right: 1pt" :status-color="statusColor" />
     <AutoWidthInput v-model="title" type="text" placeholder="unnamed" />
     <button v-if="!showDailyPrio && progress < 100" title="finish" @click="progress = 100"><FontAwesomeIcon icon="check" /></button>
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import AutoWidthInput from "@/components/AutoWidthInput";
-import ProgressCircle from "@/components/ProgressCircle";
+import AutoWidthInput from "@renderer/components/AutoWidthInput.vue";
+import ProgressCircle from "@renderer/components/ProgressCircle.vue";
 
 export default {
   name: "TaskItem",
@@ -96,8 +96,9 @@ export default {
         } else {
           this.dailyPrio = false
           //perhaps add a setting whether this should happen when the task is done or daily done
+          //TODO: add a way to reset the buffer days (actually reset the reference date)
           if (this.statusColor)
-            this.$store.commit({type: 'updateTask', id: this.id, bufferDays: null})
+            this.$store.commit({type: 'updateTask', id: this.id, bufferDays: false})
         }
       }
     },
@@ -127,8 +128,8 @@ export default {
     },
     statusColor: {
       get() {
-        const buffer = this.$store.getters.getTodoField(this.id, "bufferDays") ?? -1
-        return buffer < 0 ? undefined :
+        const buffer = this.$store.getters.getDaysLeft(this.id) ?? -1
+        return (buffer === false || buffer < 0) ? undefined :
             buffer === 0 ? "black" : //magenta would work too
             buffer === 1 ? "red" :
             buffer === 2 ? "gold" :

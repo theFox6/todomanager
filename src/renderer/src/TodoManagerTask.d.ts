@@ -14,7 +14,7 @@ declare namespace TodoManager {
         reluctance?: number,
         //days left to fulfill
         bufferDays?: number,
-        referenceDate?: number,
+        referenceDate?: number[],
         //dailies
         dailyPrio?: number,
         dailyDone?: boolean,

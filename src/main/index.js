@@ -1,15 +1,14 @@
 'use strict'
 
-import {app, protocol, BrowserWindow} from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import {app, BrowserWindow} from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import * as path from "path";
+import {registerAppProtocol, registerProtocolsPrivilege} from './protocols.js'
+import tm_icon from '@resources/todo-manager.png?asset'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
-])
+registerProtocolsPrivilege()
 
 async function createWindow() {
   // Create the browser window.
@@ -17,9 +16,10 @@ async function createWindow() {
     width: 800,
     height: 600,
     title: "ToDo Manager",
-    icon: path.join(__dirname, "/assets/todo-manager.png"),
+    icon: tm_icon,
+    show: false,
     webPreferences: {
-      
+      preload: path.join(__dirname, '..', 'preload', 'index.js'),
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -27,12 +27,16 @@ async function createWindow() {
     }
   })
 
+  win.on('ready-to-show', () => win.show())
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
+  } else if (process.env.ELECTRON_RENDERER_URL) {
+    await win.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
-    createProtocol('app')
+    registerAppProtocol()
     // Load the index.html when not in development
     win.loadURL('app://./index.html').catch(console.error)
   }
@@ -40,6 +44,9 @@ async function createWindow() {
 
 //remove menu
 //Menu.setApplicationMenu(null)
+
+//force specific locale
+app.commandLine.appendSwitch("lang","de")
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {

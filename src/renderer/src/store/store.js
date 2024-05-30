@@ -1,33 +1,9 @@
 import { createStore } from 'vuex'
-import NoSuchElementError from "@/NoSuchElementError";
+import NoSuchElementError from "@renderer/NoSuchElementError";
+import TodoProperties from "@renderer/store/TodoProperties";
 
 function saveTodos(state) {
     localStorage.setItem('todos', JSON.stringify(state.todos))
-}
-
-/**
- * calculates the priority of the task based on its parameters
- *
- * a more important task gets a greater priority number
- * @param task {TodoManager.Task} the task to be evaluated
- * @return {number} a number representing the tasks priority
- */
-function calculatePriority(task) {
-    //TODO: estimate time needed based on progress, workload and difficulty
-    //      compare it to the time due and let urgency be the deciding factor
-    const p = task.progress || 0
-    if (p >= 100)
-        return -1
-    const stats = (task.urgency || 0) + (task.difficulty || 0) + (task.reluctance || 0)
-    const buffFactor = task.bufferDays ? 1 + 1 / task.bufferDays : 1
-    return stats * buffFactor / (1 + p / 50)
-}
-
-function isOverdueFilter() {
-    const stamp = new Date(Date.now())
-    const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
-    return (task) => typeof task.dailyPrio === "number" && (!task.dailyDone) &&
-        (task.dailyDate && date.some((v,i) => v !== task.dailyDate[i])) //does not account for future dates
 }
 
 export default createStore({
@@ -61,6 +37,9 @@ export default createStore({
                 return item[fieldName]
             return undefined
         },
+        getDaysLeft: (state) => (id) => {
+            return TodoProperties.calculateBufferDays(state.todos.find((t) => t.id === id))
+        },
         /**
          * gets all todos sorted by priority
          * @deprecated use filtering getters instead to exclude archived Todos
@@ -68,7 +47,7 @@ export default createStore({
          * @return {TodoManager.Task[]}
          */
         todosByPriority(state) {
-            return state.todos.sort((a, b) => calculatePriority(b) - calculatePriority(a))
+            return state.todos.sort((a, b) => TodoProperties.calculatePriority(b) - TodoProperties.calculatePriority(a))
         },
         /**
          * gets all tasks that are marked daily
@@ -76,30 +55,53 @@ export default createStore({
          * @return {TodoManager.Task[]}
          */
         dailies(state) {
-            const stamp = new Date(Date.now())
-            const date = [stamp.getDate(), stamp.getMonth(), stamp.getFullYear()]
-            const isDaily = (t) => typeof t.dailyPrio === "number" &&
-                ((!t.dailyDate) || date.every((v,i) => v === t.dailyDate[i]))
-            //TODO: take daily done into account as well
+            const today = new Date(Date.now())
+            today.setHours(0,0,0,0)
+            const isDaily = (t) => {
+                if (typeof t.dailyPrio !== "number")
+                    return false
+                const da = t.dailyDate
+                if (typeof da !== "object" || da.length !== 3)
+                    return true
+                const dd = new Date(da[2],da[1],da[0])
+                if (dd > today)
+                    return false
+                return TodoProperties.calculateBufferDays(t) > 0 || !(dd < today)
+            }
+            //perhaps take daily done into account as well if dailyPrio is equal
             return state.todos.filter(isDaily)
-                .sort((a, b) => calculatePriority(b) - calculatePriority(a))
+                .sort((a, b) => TodoProperties.calculatePriority(b) - TodoProperties.calculatePriority(a))
                 .sort((a, b) => a.dailyPrio - b.dailyPrio)
         },
         overdueTodos(state) {
-            return state.todos.filter(isOverdueFilter())
-                .sort((a, b) => calculatePriority(b) - calculatePriority(a))
+            return state.todos.filter(TodoProperties.isOverdueFilter())
+                .sort((a, b) => TodoProperties.calculatePriority(b) - TodoProperties.calculatePriority(a))
+                .sort((a, b) => a.dailyPrio - b.dailyPrio)
+        },
+        scheduledTodos(state) {
+            return state.todos.filter(TodoProperties.isScheduledFilter())
+                .sort((a, b) => TodoProperties.calculatePriority(b) - TodoProperties.calculatePriority(a))
                 .sort((a, b) => a.dailyPrio - b.dailyPrio)
         },
         backlogTodos(state) {
             return state.todos.filter((task) => !task.archived)
-                .sort((a, b) => calculatePriority(b) - calculatePriority(a))
+                .sort((a, b) => TodoProperties.calculatePriority(b) - TodoProperties.calculatePriority(a))
         },
         //TODO: change to todosByArchive
         archivedTodos(state) {
             return state.todos.filter((task) => task.archived)
         },
         anyOverdue(state) {
-            return state.todos.some(isOverdueFilter())
+            return state.todos.some(TodoProperties.isOverdueFilter())
+        },
+        anyScheduled(state) {
+            return state.todos.some(TodoProperties.isScheduledFilter())
+        },
+        isScheduled: (state) => (id) => {
+            const item = state.todos.find((t) => t.id === id)
+            if (item)
+                return TodoProperties.isScheduledFilter()(item)
+            return false
         }
     },
     mutations: {
@@ -137,39 +139,6 @@ export default createStore({
         },
         deleteTask(state, id) {
             state.todos = state.todos.filter((t) => t.id !== id);
-        }
-    },
-    actions: {
-        update(context) {
-            const date = new Date(Date.now())
-            //console.log("today is", date)
-            for (const id of context.getters.todosIDs) {
-                if (!id) {
-                    console.error("todo without id")
-                    continue
-                }
-                let ref = context.getters.getTodoField(id, "referenceDate")
-                if (!ref)
-                    continue
-                ref = new Date(ref[2], ref[1], ref[0])
-                //console.log("to do", id, "has reference date", ref)
-                const MS_PER_DAY = 1000 * 60 * 60 * 24
-                const daysPassed = Math.floor((date - ref) / MS_PER_DAY)
-                //console.log("to do", id, "passed", daysPassed, "days")
-                if (daysPassed === 0)
-                    continue
-                const update = {
-                    type: 'updateTask', id: id,
-                    referenceDate: [date.getDate(), date.getMonth(), date.getFullYear()]
-                }
-
-                const buf = context.getters.getTodoField(id, "bufferDays")
-                if (buf > -1)
-                    update.bufferDays = Math.max(buf - daysPassed, 0)
-
-                //console.log("commiting update", update)
-                context.commit(update)
-            }
         }
     }
 })

@@ -7,14 +7,16 @@
       <tr><td>difficulty:</td><td><input v-model.number="difficulty" type="range" min="0" max="100" /></td><td><font-awesome-icon :icon="difficultyIcon" /></td><td>{{ difficulty }}%</td></tr>
       <tr><td>reluctance:</td><td><input v-model.number="reluctance" type="range" min="0" max="100" /></td><td><font-awesome-icon :icon="reluctanceIcon" /></td><td>{{ reluctance }}%</td></tr>
     </table>
-    <p class="setting"><label>do today:<input v-model="isDaily" type="checkbox" /></label><label>with priority:<input v-model.number="dailyPrio" type="number" :disabled="!isDaily" /></label></p>
-    <p class="setting"><label>days left to fulfill:<input v-model.number="bufferDays" type="number" /></label></p>
+    <p class="setting"><button @click="isDaily = !isDaily">{{ isDaily ? "unschedule" : "schedule" }}</button><label>priority:<input v-model.number="dailyPrio" type="number" :disabled="!isDaily" /></label></p>
+    <p class="setting"><button @click="setToday">do today</button><label>start on:<input v-model.lazy="dailyDate" type="date" /></label></p>
+    <p class="setting"><label>days to fulfill:<input v-model.number="bufferDays" type="number" /></label></p>
     <!--ToDo: add a selection for archiving-->
   </div>
 </template>
 
 <script>
-import AutoWidthInput from "@/components/AutoWidthInput";
+import AutoWidthInput from "@renderer/components/AutoWidthInput.vue";
+
 export default {
   name: "TaskEditor",
   components: {AutoWidthInput},
@@ -74,35 +76,71 @@ export default {
           this.progress < 95 ? "screwdriver-wrench" : this.progress < 100 ? "magnifying-glass" : "check"
     },
     dailyPrio: {
-      get() {return this.$store.getters.getTodoField(this.id, "dailyPrio")},
+      get() {
+        const prio = this.$store.getters.getTodoField(this.id, "dailyPrio");
+        return prio === false ? "" : prio;
+      },
       set(value) {this.$store.commit({type: 'updateTask', id: this.id, dailyPrio: value})}
     },
     isDaily: {
-      get() {return typeof this.dailyPrio === 'number' || typeof this.dailyPrio === 'string'},
+      get() {return typeof this.dailyPrio === 'number' || (typeof this.dailyPrio === 'string' && this.dailyPrio !== "")},
       set(daily) {
         if (daily) {
           this.dailyPrio = 0
-          const date = new Date(Date.now())
-          this.$store.commit({type: "updateTask", id: this.id, dailyDate: [date.getDate(), date.getMonth(), date.getFullYear()]})
         } else {
           this.dailyPrio = false
         }
       }
     },
+    dailyDate: {
+      get() {
+        const date = this.$store.getters.getTodoField(this.id, "dailyDate")
+        if (typeof date == "object" && date.length === 3) {
+          const dstring = date[2] + "-" + (date[1]+1).toString().padStart(2,'0') + "-" + date[0].toString().padStart(2,'0')
+          return dstring
+        } else
+          return ""
+      },
+      set(date) {
+        if (date === "")
+          return
+        const parts = date.split("-")
+        this.$store.commit({type: "updateTask", id: this.id, dailyDate: [parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0])]})
+      }
+    },
     bufferDays: {
-      get() {return this.$store.getters.getTodoField(this.id, "bufferDays")},
+      get() {
+        const buf = this.$store.getters.getDaysLeft(this.id)
+        return buf === false ? "" : buf
+      },
       set(value) {
         if (typeof value === "number") {
-          const date = new Date(Date.now())
-          this.$store.commit({
+          let data = {
             type: 'updateTask', id: this.id,
-            bufferDays: value, referenceDate: [date.getDate(), date.getMonth(), date.getFullYear()]
-          })
+            bufferDays: value
+          }
+          if (this.$store.getters.isScheduled(this.id)) {
+            //would not be needed if correct reference date is set
+            data.referenceDate = this.$store.getters.getTodoField(this.id, "dailyDate")
+          } else {
+            const today = new Date(Date.now())
+            data.referenceDate = [today.getDate(), today.getMonth(), today.getFullYear()]
+          }
+          this.$store.commit(data)
         } else if (value === "")
-          this.$store.commit({type: 'updateTask', id: this.id, bufferDays: null})
+          this.$store.commit({type: 'updateTask', id: this.id, bufferDays: false})
         else
           console.info("invalid number of days left:", value)
       }
+    }
+  },
+  methods: {
+    setToday() {
+      const date = new Date(Date.now())
+      let data = {type: "updateTask", id: this.id, dailyDate: [date.getDate(), date.getMonth(), date.getFullYear()]}
+      if (!this.isDaily)
+        data.dailyPrio = 0
+      this.$store.commit(data)
     }
   }
 }

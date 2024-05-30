@@ -9,6 +9,12 @@
       <p class="section-header"><font-awesome-icon icon="exclamation-circle" />Overdue<span /></p>
       <TaskList :todos="overdueTasks" :show-daily-prio="true" :show-add-button="false" @editTask="editTask" />
     </div>
+    <div v-if="anyScheduled">
+      <button class="section-header" @click="scheduled = !scheduled">
+        <font-awesome-icon icon="calendar-plus" />Scheduled<font-awesome-icon :icon="scheduled ? 'angle-up' : 'angle-down'" />
+      </button>
+      <TaskList v-if="scheduled" :todos="scheduledTasks" :show-add-button="false" @editTask="editTask" />
+    </div>
     <button class="section-header" @click="backlog = !backlog">
       <font-awesome-icon icon="archive" /> Backlog <font-awesome-icon :icon="backlog ? 'angle-up' : 'angle-down'" />
     </button>
@@ -27,9 +33,9 @@
 </template>
 
 <script>
-import TaskList from "@/components/TaskList";
-import TaskEditor from "@/components/TaskEditor";
-import ActionBar from "@/components/ActionBar.vue";
+import TaskList from "@renderer/components/TaskList.vue";
+import TaskEditor from "@renderer/components/TaskEditor.vue";
+import ActionBar from "@renderer/components/ActionBar.vue";
 
 export default {
   name: 'App',
@@ -41,6 +47,7 @@ export default {
   data() {
     return {
       backlog: false,
+      scheduled: false,
       listArchives: false,
       editingTask: false,
       taskToEdit: 0
@@ -65,6 +72,16 @@ export default {
     },
     anyOverdue() {
       return this.$store.getters.anyOverdue
+    },
+    /**
+     * lists the scheduled tasks
+     * @return {TodoManager.Task[]}
+     */
+    scheduledTasks() {
+      return this.$store.getters.scheduledTodos
+    },
+    anyScheduled() {
+      return this.$store.getters.anyScheduled
     }
   },
   methods: {
